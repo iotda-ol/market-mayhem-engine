@@ -86,8 +86,8 @@ export class EncounterSystem {
   }
 
   private resolveFight(player: Player): EncounterResult {
-    const fightBonus = player.inventory.hasItem('bodyarmor') ? 0.2 : 0;
-    const victoryChance = 0.5 + fightBonus;
+    const victoryBonus = player.inventory.hasItem('bodyarmor') ? 0.2 : 0;
+    const victoryChance = 0.5 + victoryBonus;
     if (Math.random() < victoryChance) {
       const moneyGain = Math.floor(100 + Math.random() * 500);
       player.gainCash(moneyGain);
