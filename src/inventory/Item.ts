@@ -22,7 +22,7 @@ export const SHOP_ITEMS: Item[] = [
   {
     id: 'bodyarmor',
     name: 'Body Armor',
-    description: 'Reduces damage taken in fights by 20%',
+    description: 'Increases fight victory chance by 20% and reduces damage taken by 20%',
     price: 500,
     effect: { type: 'fight_bonus', value: 0.2 },
   },
