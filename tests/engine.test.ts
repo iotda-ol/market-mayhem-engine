@@ -306,6 +306,57 @@ describe('GameEngine', () => {
     });
   });
 
+  describe('Win condition', () => {
+    it('transitions to game_won when player reaches target cash after maxTurns', () => {
+      jest.spyOn(Math, 'random').mockReturnValue(0.9); // no encounters
+      const engine = new GameEngine(100, 2, 100); // maxTurns=2, target=$100
+      engine.joinLobby('p1', 'Alice', MERCHANT, 0);
+
+      // Turn 1
+      engine.endMarketPhase();
+      engine.travel('harbor');
+      engine.applyMarketUpdate();
+      expect(engine.getContext().phase).toBe('market');
+
+      // Turn 2 (final)
+      engine.endMarketPhase();
+      engine.travel('eastside');
+      engine.applyMarketUpdate();
+      // MERCHANT starts with $2000, target is $100 — should win
+      expect(engine.getContext().phase).toBe('game_won');
+      expect(engine.getContext().isGameWon).toBe(true);
+    });
+
+    it('transitions to game_over when player has insufficient net worth after maxTurns', () => {
+      jest.spyOn(Math, 'random').mockReturnValue(0.9); // no encounters
+      const engine = new GameEngine(100, 2, 999999); // maxTurns=2, target=$999,999 (impossible)
+      engine.joinLobby('p1', 'Alice', MERCHANT, 0);
+
+      // Turn 1
+      engine.endMarketPhase();
+      engine.travel('harbor');
+      engine.applyMarketUpdate();
+
+      // Turn 2 (final)
+      engine.endMarketPhase();
+      engine.travel('eastside');
+      engine.applyMarketUpdate();
+      expect(engine.getContext().phase).toBe('game_over');
+      expect(engine.getContext().isGameWon).toBe(false);
+    });
+
+    it('exposes maxTurns and targetCash in context', () => {
+      const engine = new GameEngine(5, 15, 5000);
+      expect(engine.getContext().maxTurns).toBe(15);
+      expect(engine.getContext().targetCash).toBe(5000);
+    });
+
+    it('isGameWon starts as false', () => {
+      const engine = makeEngine();
+      expect(engine.getContext().isGameWon).toBe(false);
+    });
+  });
+
   describe('getLog', () => {
     it('returns a copy of the log', () => {
       const engine = makeEngine();

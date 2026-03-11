@@ -37,7 +37,10 @@ export function createGameRouter(sessionService: GameSessionService): Router {
     return {
       phase: ctx.phase,
       turnNumber: ctx.turnNumber,
+      maxTurns: ctx.maxTurns,
+      targetCash: ctx.targetCash,
       isGameOver: ctx.isGameOver,
+      isGameWon: ctx.isGameWon,
       pendingEncounter: ctx.pendingEncounter,
       player,
       currentMarket,

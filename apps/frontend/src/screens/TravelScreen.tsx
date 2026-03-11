@@ -21,7 +21,7 @@ export function TravelScreen({ ctx, onTravel, loading }: Props) {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>🚗 Where to?</h2>
-      <p style={styles.warning}>⚠️ 40% chance of encounter when traveling</p>
+      <p style={styles.warning}>⚠️ 30% chance of encounter when traveling</p>
 
       <div style={styles.grid}>
         {ALL_LOCATIONS.map(loc => {

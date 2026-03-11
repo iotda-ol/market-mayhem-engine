@@ -113,6 +113,36 @@ describe('Market', () => {
         expect(stock.price).toBeLessThanOrEqual(stock.maxPrice);
       }
     });
+
+    it('records price history after updates', () => {
+      const market = makeMarket();
+      const techBefore = market.getStockList().find(s => s.id === 'TECH')!.price;
+      market.updatePrices();
+      const techAfter = market.getStockList().find(s => s.id === 'TECH')!;
+      expect(techAfter.priceHistory).toContain(techBefore);
+    });
+
+    it('limits price history to 5 entries', () => {
+      const market = makeMarket();
+      for (let i = 0; i < 10; i++) {
+        market.updatePrices();
+      }
+      for (const stock of market.getStockList()) {
+        expect(stock.priceHistory.length).toBeLessThanOrEqual(5);
+      }
+    });
+
+    it('sets changePercent reflecting direction of price movement', () => {
+      const market = makeMarket();
+      // Run many times; some changePercents should be non-zero
+      for (let i = 0; i < 10; i++) {
+        market.updatePrices();
+      }
+      const stocks = market.getStockList();
+      // At least some stocks should have non-zero changePercent
+      const anyNonZero = stocks.some(s => s.changePercent !== 0);
+      expect(anyNonZero).toBe(true);
+    });
   });
 
   describe('getStockList', () => {
