@@ -5,7 +5,8 @@ export type GamePhase =
   | 'encounter'
   | 'shop'
   | 'market_update'
-  | 'game_over';
+  | 'game_over'
+  | 'game_won';
 
 export interface Stock {
   id: string;
@@ -14,6 +15,9 @@ export interface Stock {
   minPrice: number;
   maxPrice: number;
   volatility: number;
+  priceHistory: number[];
+  changePercent: number;
+  newsEvent?: string;
 }
 
 export interface MarketSnapshot {
@@ -40,7 +44,10 @@ export interface PlayerSnapshot {
 export interface GameContext {
   phase: GamePhase;
   turnNumber: number;
+  maxTurns: number;
+  targetCash: number;
   isGameOver: boolean;
+  isGameWon: boolean;
   pendingEncounter: boolean;
   player: PlayerSnapshot | null;
   currentMarket: MarketSnapshot | null;

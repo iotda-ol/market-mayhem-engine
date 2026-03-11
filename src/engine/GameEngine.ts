@@ -13,7 +13,8 @@ export type GamePhase =
   | 'encounter'
   | 'shop'
   | 'market_update'
-  | 'game_over';
+  | 'game_over'
+  | 'game_won';
 
 export interface GameContext {
   player: Player | null;
@@ -21,19 +22,22 @@ export interface GameContext {
   currentMarket: Market | null;
   turnNumber: number;
   shopTurnInterval: number;
+  maxTurns: number;
+  targetCash: number;
   encounterSystem: EncounterSystem;
   pendingEncounter: boolean;
   lastEncounterChoice?: EncounterChoice;
   phase: GamePhase;
   log: string[];
   isGameOver: boolean;
+  isGameWon: boolean;
 }
 
 export class GameEngine {
   private context: GameContext;
   private currentState: GameState | null = null;
 
-  constructor(shopTurnInterval: number = 5) {
+  constructor(shopTurnInterval: number = 5, maxTurns: number = 15, targetCash: number = 5000) {
     const locationIds = LOCATIONS.map((l) => l.id);
     this.context = {
       player: null,
@@ -41,11 +45,14 @@ export class GameEngine {
       currentMarket: null,
       turnNumber: 0,
       shopTurnInterval,
-      encounterSystem: new EncounterSystem(0.4, locationIds),
+      maxTurns,
+      targetCash,
+      encounterSystem: new EncounterSystem(0.3, locationIds),
       pendingEncounter: false,
       phase: 'lobby',
       log: [],
       isGameOver: false,
+      isGameWon: false,
     };
   }
 
@@ -220,6 +227,30 @@ export class GameEngine {
     }
     this.context.turnNumber++;
     this.addLog('Market prices updated. New turn begins.');
+
+    // Check win condition: survive all turns with enough cash
+    if (this.context.turnNumber >= this.context.maxTurns) {
+      const player = this.context.player;
+      if (player) {
+        // Calculate portfolio value: cash + stocks at current market prices
+        let portfolioValue = player.cash;
+        if (this.context.currentMarket) {
+          for (const { itemId, quantity } of player.inventory.listItems()) {
+            const stock = this.context.currentMarket.stocks.get(itemId);
+            if (stock && quantity > 0) {
+              portfolioValue += stock.price * quantity;
+            }
+          }
+        }
+        if (portfolioValue >= this.context.targetCash) {
+          this.setState(new GameWonState());
+          return;
+        }
+      }
+      this.setState(new GameOverState());
+      return;
+    }
+
     this.setState(new MarketPhaseState());
   }
 
@@ -296,6 +327,15 @@ class GameOverState implements GameState {
   exit(_context: GameContext): void {}
 }
 
+class GameWonState implements GameState {
+  readonly name = 'game_won';
+  enter(context: GameContext): void {
+    context.isGameWon = true;
+    context.log.push(`[Turn ${context.turnNumber}] 🏆 VICTORY! ${context.player?.name ?? 'Player'} reached the target!`);
+  }
+  exit(_context: GameContext): void {}
+}
+
 // Export state classes for external use / testing
 export {
   LobbyState,
@@ -305,4 +345,5 @@ export {
   ShopState,
   MarketUpdateState,
   GameOverState,
+  GameWonState,
 };

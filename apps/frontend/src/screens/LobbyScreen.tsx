@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import type { LoadoutKey } from '../api/types';
 
-const LOADOUTS: { key: LoadoutKey; name: string; cash: number; health: number; desc: string }[] = [
-  { key: 'MERCHANT', name: 'Merchant', cash: 2000, health: 80, desc: 'High cash, low health. Best for trading.' },
-  { key: 'STREET_FIGHTER', name: 'Street Fighter', cash: 1000, health: 120, desc: 'Low cash, high health. Win your way through encounters.' },
-  { key: 'RUNNER', name: 'Runner', cash: 1500, health: 100, desc: 'Balanced. Great escape odds with Speed Boots.' },
+const LOADOUTS: { key: LoadoutKey; name: string; cash: number; health: number; desc: string; emoji: string }[] = [
+  { key: 'MERCHANT', name: 'Merchant', cash: 2000, health: 80, desc: 'High cash, low health. Best for pure trading strategies.', emoji: '💼' },
+  { key: 'STREET_FIGHTER', name: 'Street Fighter', cash: 1000, health: 120, desc: 'Low cash, high health. Win encounters for extra cash.', emoji: '🥊' },
+  { key: 'RUNNER', name: 'Runner', cash: 1500, health: 100, desc: 'Balanced. +30% escape chance with Speed Boots.', emoji: '👟' },
 ];
 
 interface Props {
@@ -20,6 +20,16 @@ export function LobbyScreen({ onJoin, loading }: Props) {
     <div style={styles.container}>
       <h1 style={styles.title}>📈 Market Mayhem</h1>
       <p style={styles.subtitle}>Trade stocks. Survive encounters. Build your empire.</p>
+
+      <div style={styles.goalBanner}>
+        <div style={styles.goalTitle}>🎯 OBJECTIVE</div>
+        <div style={styles.goalText}>
+          Reach <strong style={{ color: '#ffd700' }}>$5,000 net worth</strong> in <strong style={{ color: '#00ff88' }}>15 turns</strong>
+        </div>
+        <div style={styles.goalHint}>
+          Buy low, sell high. Watch out for news events and encounters!
+        </div>
+      </div>
 
       <div style={styles.card}>
         <label style={styles.label}>Your Name</label>
@@ -44,6 +54,7 @@ export function LobbyScreen({ onJoin, loading }: Props) {
               }}
               onClick={() => setSelectedLoadout(l.key)}
             >
+              <div style={styles.loadoutEmoji}>{l.emoji}</div>
               <div style={styles.loadoutName}>{l.name}</div>
               <div style={styles.loadoutStat}>💰 ${l.cash.toLocaleString()}</div>
               <div style={styles.loadoutStat}>❤️ {l.health} HP</div>
@@ -70,13 +81,18 @@ export function LobbyScreen({ onJoin, loading }: Props) {
 const styles: Record<string, React.CSSProperties> = {
   container: { maxWidth: 700, margin: '0 auto', padding: '40px 20px', fontFamily: 'monospace' },
   title: { textAlign: 'center', fontSize: 36, color: '#00ff88', margin: '0 0 8px' },
-  subtitle: { textAlign: 'center', color: '#888', marginBottom: 32 },
+  subtitle: { textAlign: 'center', color: '#888', marginBottom: 24 },
+  goalBanner: { background: '#0a1a0a', border: '1px solid #1a4a1a', borderRadius: 8, padding: '16px 20px', marginBottom: 24, textAlign: 'center' },
+  goalTitle: { color: '#00ff88', fontSize: 12, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 8 },
+  goalText: { color: '#fff', fontSize: 16, marginBottom: 8 },
+  goalHint: { color: '#666', fontSize: 13 },
   card: { background: '#1a1a2e', border: '1px solid #333', borderRadius: 8, padding: 20, marginBottom: 20 },
   label: { display: 'block', color: '#aaa', marginBottom: 8, fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 },
-  input: { width: '100%', padding: '10px 14px', background: '#0d0d1a', border: '1px solid #444', borderRadius: 6, color: '#fff', fontSize: 16, boxSizing: 'border-box' },
+  input: { width: '100%', padding: '10px 14px', background: '#0d0d1a', border: '1px solid #444', borderRadius: 6, color: '#fff', fontSize: 16, boxSizing: 'border-box', fontFamily: 'monospace' },
   loadoutGrid: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 },
-  loadoutCard: { background: '#0d0d1a', border: '2px solid #333', borderRadius: 8, padding: 16, cursor: 'pointer', transition: 'border-color 0.2s' },
+  loadoutCard: { background: '#0d0d1a', border: '2px solid #333', borderRadius: 8, padding: 16, cursor: 'pointer', transition: 'border-color 0.2s', textAlign: 'center' },
   loadoutSelected: { borderColor: '#00ff88' },
+  loadoutEmoji: { fontSize: 28, marginBottom: 8 },
   loadoutName: { color: '#fff', fontWeight: 'bold', marginBottom: 8, fontSize: 15 },
   loadoutStat: { color: '#aaa', fontSize: 13, marginBottom: 4 },
   loadoutDesc: { color: '#666', fontSize: 12, marginTop: 8 },

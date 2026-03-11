@@ -12,6 +12,7 @@ import {
   ShopState,
   MarketUpdateState,
   GameOverState,
+  GameWonState,
   LobbyState,
 } from './GameEngine';
 
@@ -39,8 +40,11 @@ export interface SerializedGameState {
   phase: GamePhase;
   turnNumber: number;
   shopTurnInterval: number;
+  maxTurns: number;
+  targetCash: number;
   pendingEncounter: boolean;
   isGameOver: boolean;
+  isGameWon: boolean;
   log: string[];
   player: SerializedPlayer | null;
   markets: SerializedMarket[];
@@ -103,6 +107,7 @@ function phaseToState(phase: GamePhase) {
     case 'shop': return new ShopState();
     case 'market_update': return new MarketUpdateState();
     case 'game_over': return new GameOverState();
+    case 'game_won': return new GameWonState();
     default: return new LobbyState();
   }
 }
@@ -114,19 +119,26 @@ export function serializeGameEngine(engine: GameEngine): SerializedGameState {
     phase: ctx.phase,
     turnNumber: ctx.turnNumber,
     shopTurnInterval: ctx.shopTurnInterval,
+    maxTurns: ctx.maxTurns,
+    targetCash: ctx.targetCash,
     pendingEncounter: ctx.pendingEncounter,
     isGameOver: ctx.isGameOver,
+    isGameWon: ctx.isGameWon,
     log: [...ctx.log],
     player: ctx.player ? serializePlayer(ctx.player) : null,
     markets,
     currentMarketId: ctx.currentMarket?.locationId ?? null,
-    encounterProbability: 0.4,
+    encounterProbability: 0.3,
     availableLocations: LOCATIONS.map((l) => l.id),
   };
 }
 
 export function deserializeGameEngine(data: SerializedGameState): GameEngine {
-  const engine = new GameEngine(data.shopTurnInterval);
+  const engine = new GameEngine(
+    data.shopTurnInterval,
+    data.maxTurns ?? 15,
+    data.targetCash ?? 5000
+  );
   const ctx = engine.getContext();
 
   // Restore log
@@ -138,6 +150,7 @@ export function deserializeGameEngine(data: SerializedGameState): GameEngine {
   // Restore flags
   ctx.pendingEncounter = data.pendingEncounter;
   ctx.isGameOver = data.isGameOver;
+  ctx.isGameWon = data.isGameWon ?? false;
 
   // Restore markets
   ctx.markets.clear();

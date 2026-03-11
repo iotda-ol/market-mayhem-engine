@@ -30,7 +30,7 @@ export function App() {
 
   const updateCtx = (newCtx: GameContext, sid: string) => {
     setCtx(newCtx);
-    if (newCtx.phase === 'game_over') {
+    if (newCtx.phase === 'game_over' || newCtx.phase === 'game_won') {
       api.getLog(sid).then(r => setLog(r.log)).catch(() => {});
     }
   };
@@ -180,7 +180,7 @@ export function App() {
         />
       )}
 
-      {ctx.phase === 'game_over' && (
+      {(ctx.phase === 'game_over' || ctx.phase === 'game_won') && (
         <GameOverScreen ctx={ctx} log={log} onRestart={handleRestart} />
       )}
     </div>
