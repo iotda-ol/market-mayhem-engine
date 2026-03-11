@@ -4,10 +4,27 @@
   "description": "A market trading game engine with state machine architecture",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "build": "tsc",
+    "build:all": "npm run build && npm run build --workspace=apps/backend && npm run build --workspace=apps/frontend",
     "test": "jest",
-    "lint": "eslint src/**/*.ts tests/**/*.ts"
+    "test:all": "npm test && npm test --workspace=apps/backend --if-present",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "lint:backend": "npm run lint --workspace=apps/backend",
+    "lint:frontend": "npm run lint --workspace=apps/frontend",
+    "lint:all": "npm run lint && npm run lint:backend && npm run lint:frontend",
+    "type-check": "tsc --noEmit",
+    "type-check:all": "npm run type-check && npm run type-check --workspace=apps/backend && npm run type-check --workspace=apps/frontend",
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -16,6 +33,7 @@
     "@typescript-eslint/parser": "^7.13.0",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
+    "prettier": "^3.3.2",
     "ts-jest": "^29.1.5",
     "typescript": "^5.5.2"
   }

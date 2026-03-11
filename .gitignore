@@ -1,3 +1,31 @@
 node_modules/
 dist/
 coverage/
+
+# Workspace app build outputs
+apps/*/dist/
+apps/*/coverage/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ESLint cache
+.eslintcache
+
+# Vite
+apps/frontend/dist/

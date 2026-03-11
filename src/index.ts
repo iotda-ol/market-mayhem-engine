@@ -13,3 +13,5 @@ export {
 } from './encounter/EncounterSystem';
 export { GameState } from './engine/states/GameState';
 export type { GameContext, GamePhase } from './engine/GameEngine';
+export { serializeGameEngine, deserializeGameEngine } from './engine/GameSerializer';
+export type { SerializedGameState } from './engine/GameSerializer';

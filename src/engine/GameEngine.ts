@@ -62,6 +62,11 @@ export class GameEngine {
     this.currentState.enter(this.context);
   }
 
+  public restoreState(state: GameState): void {
+    this.currentState = state;
+    // NOTE: does not call enter() — used for deserialization only
+  }
+
   public addLog(message: string): void {
     this.context.log.push(`[Turn ${this.context.turnNumber}] ${message}`);
   }

@@ -1,0 +1,10 @@
+node_modules
+apps/*/node_modules
+dist
+apps/*/dist
+.git
+.gitignore
+*.md
+tests
+coverage
+.env*
