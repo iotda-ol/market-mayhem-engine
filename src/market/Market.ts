@@ -8,6 +8,40 @@ export interface TradeResult {
   totalValue?: number;
 }
 
+// News events: [headline, priceChangeMin, priceChangeMax] (as fractions, e.g. 0.4 = +40%)
+const NEWS_EVENTS: Record<string, Array<[string, number, number]>> = {
+  TECH: [
+    ['🚀 TechCorp announces revolutionary AI product!', 0.4, 0.8],
+    ['💥 TechCorp data breach scandal rocks markets!', -0.5, -0.25],
+    ['📈 TechCorp beats earnings expectations!', 0.2, 0.4],
+    ['📉 TechCorp misses revenue targets badly.', -0.4, -0.15],
+  ],
+  DRUG: [
+    ['💊 PharmaCo blockbuster drug gets FDA approval!', 0.5, 0.9],
+    ['⚠️ PharmaCo drug recalled over safety concerns!', -0.6, -0.3],
+    ['🔬 PharmaCo cancer trial shows promising results!', 0.3, 0.6],
+    ['📋 PharmaCo patent expires — generics flood market.', -0.35, -0.15],
+  ],
+  ARMS: [
+    ['🎖️ ArmsInc wins massive defense contract!', 0.5, 1.0],
+    ['🕊️ Peace treaty threatens ArmsInc demand.', -0.55, -0.25],
+    ['💣 International tension spikes ArmsInc value!', 0.4, 0.8],
+    ['🔍 ArmsInc under investigation for corruption.', -0.45, -0.2],
+  ],
+  FOOD: [
+    ['🌾 Crop failure causes FoodChain shortage!', 0.3, 0.5],
+    ['🐄 FoodChain recall — contamination found!', -0.4, -0.2],
+    ['🌍 FoodChain expands to 50 new cities!', 0.2, 0.35],
+    ['💸 FoodChain hit by labor strike nationwide.', -0.3, -0.1],
+  ],
+  ENERGY: [
+    ['⚡ EnergyCo discovers massive oil reserve!', 0.4, 0.7],
+    ['🌱 Green energy bill slashes EnergyCo profits.', -0.45, -0.2],
+    ['🔥 Energy crisis drives EnergyCo prices up!', 0.35, 0.65],
+    ['💧 Pipeline accident halts EnergyCo operations.', -0.5, -0.25],
+  ],
+};
+
 export class Market {
   public readonly locationId: string;
   public readonly locationName: string;
@@ -72,9 +106,38 @@ export class Market {
 
   public updatePrices(): void {
     for (const [, stock] of this.stocks) {
-      const change = (Math.random() * 2 - 1) * stock.volatility;
-      const newPrice = Math.round(stock.price * (1 + change));
-      stock.price = Math.max(stock.minPrice, Math.min(stock.maxPrice, newPrice));
+      const oldPrice = stock.price;
+
+      // Push current price into history (keep last 5)
+      stock.priceHistory = [oldPrice, ...(stock.priceHistory ?? [])].slice(0, 5);
+
+      // Clear previous news
+      stock.newsEvent = undefined;
+
+      let changeMultiplier: number;
+
+      // 8% chance of a news event causing a dramatic price swing
+      if (Math.random() < 0.08) {
+        const events = NEWS_EVENTS[stock.id];
+        if (events && events.length > 0) {
+          const [headline, minPct, maxPct] = events[Math.floor(Math.random() * events.length)];
+          stock.newsEvent = headline;
+          const swingPct = minPct + Math.random() * (maxPct - minPct);
+          changeMultiplier = 1 + swingPct;
+        } else {
+          changeMultiplier = 1 + (Math.random() * 2 - 1) * stock.volatility;
+        }
+      } else {
+        changeMultiplier = 1 + (Math.random() * 2 - 1) * stock.volatility;
+      }
+
+      const rawNewPrice = Math.round(oldPrice * changeMultiplier);
+      const newPrice = Math.max(stock.minPrice, Math.min(stock.maxPrice, rawNewPrice));
+
+      stock.changePercent = oldPrice > 0
+        ? Math.round(((newPrice - oldPrice) / oldPrice) * 100)
+        : 0;
+      stock.price = newPrice;
     }
   }
 

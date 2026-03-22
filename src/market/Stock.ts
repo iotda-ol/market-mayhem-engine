@@ -5,6 +5,9 @@ export interface Stock {
   minPrice: number;
   maxPrice: number;
   volatility: number; // 0-1, higher = more volatile
+  priceHistory: number[]; // last 5 prices (most recent first)
+  changePercent: number;  // % change from previous price (current turn)
+  newsEvent?: string;     // active news headline affecting this stock
 }
 
 export function createStock(
@@ -20,6 +23,8 @@ export function createStock(
     minPrice: Math.floor(basePrice * 0.1),
     maxPrice: Math.floor(basePrice * 5),
     volatility,
+    priceHistory: [],
+    changePercent: 0,
   };
 }
 
