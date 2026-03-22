@@ -24,6 +24,9 @@
     "type-check:all": "npm run type-check && npm run type-check --workspace=apps/backend && npm run type-check --workspace=apps/frontend",
     "dev:backend": "npm run dev --workspace=apps/backend",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "lint:mobile": "npm run lint --workspace=apps/mobile",
+    "type-check:mobile": "npm run type-check --workspace=apps/mobile",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\" --ignore-path .gitignore"
   },
   "devDependencies": {
